@@ -1,21 +1,13 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import * as THREE from "three";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import {
-  Radio,
-  Trophy,
-  Map as MapIcon,
-  Palette,
-  Activity,
-  ListChecks,
   Wifi,
   WifiOff,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
 
 /* ---------------------------------------------------------
-   TOKENS — neon CRT arcade cabinet
+    TOKENS — neon CRT arcade cabinet
 --------------------------------------------------------- */
 const C = {
   crt: "#1a1330",
@@ -48,7 +40,7 @@ const DISPLAY_FONT = "'Arial Black', Arial, sans-serif";
 const MONO_FONT = "'Share Tech Mono', monospace";
 
 /* ---------------------------------------------------------
-   TRICK DEFINITIONS
+    TRICK DEFINITIONS
 --------------------------------------------------------- */
 const TRICKS = [
   { name: "Ollie", baseScore: 50, minAir: 150, category: "figure" },
@@ -74,56 +66,8 @@ const TRICKS = [
   { name: "Feeble Grind", baseScore: 118, minAir: 0, category: "grind" },
 ];
 
-const TRICK_CATEGORIES = [
-  { id: "figure", label: "FIGURES", color: C.yellow },
-  { id: "slide", label: "SLIDES", color: C.cyan },
-  { id: "grind", label: "GRINDS", color: C.magenta },
-  { id: "combo", label: "COMBOS", color: C.green },
-];
-
-function seededRandom(seed) {
-  let s = seed % 2147483647;
-  if (s <= 0) s += 2147483646;
-  return () => {
-    s = (s * 16807) % 2147483647;
-    return (s - 1) / 2147483646;
-  };
-}
-function nameSeed(name) {
-  let h = 0;
-  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
-  return h || 1;
-}
-function generateBotLibrary(bot) {
-  const rand = seededRandom(nameSeed(bot.name));
-  return TRICKS.map((t) => {
-    const attempted = rand() > 0.3;
-    const landed = attempted ? Math.floor(rand() * 140) + 1 : 0;
-    const variance = 0.6 + rand() * 0.4;
-    const best = landed ? Math.round(t.baseScore * variance) : 0;
-    return { name: t.name, category: t.category, landed, best };
-  }).map((entry) =>
-    entry.name === bot.bestTrick.name
-      ? { ...entry, landed: Math.max(entry.landed, 14), best: bot.bestTrick.score }
-      : entry
-  );
-}
-
-const NATIONS = [
-  { code: "FR", name: "France", flag: "🇫🇷" },
-  { code: "ES", name: "Espagne", flag: "🇪🇸" },
-  { code: "DE", name: "Allemagne", flag: "🇩🇪" },
-  { code: "GB", name: "Royaume-Uni", flag: "🇬🇧" },
-  { code: "PT", name: "Portugal", flag: "🇵🇹" },
-  { code: "IT", name: "Italie", flag: "🇮🇹" },
-  { code: "NL", name: "Pays-Bas", flag: "🇳🇱" },
-  { code: "BE", name: "Belgique", flag: "🇧🇪" },
-  { code: "CH", name: "Suisse", flag: "🇨🇭" },
-  { code: "SE", name: "Suede", flag: "🇸🇪" },
-];
-
 /* ---------------------------------------------------------
-   CUSTOMIZATION OPTIONS — named items like the arcade UI
+    CUSTOMIZATION OPTIONS — named items like the arcade UI
 --------------------------------------------------------- */
 const DECKS = [
   { name: "NO LIMIT SKATE (SKULL)", color: "#ff2fd6" },
@@ -193,7 +137,7 @@ const SHOES = [
 ];
 
 /* ---------------------------------------------------------
-   3D PROCEDURAL BUILDERS
+    3D PROCEDURAL BUILDERS
 --------------------------------------------------------- */
 function makeFaceTexture(skinColor) {
   const cnv = document.createElement("canvas");
@@ -332,7 +276,7 @@ function buildSkateRig(custom, stance = "regular") {
     const thigh = shadowAll(new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.045, 0.22, 10), pantsMat)); thigh.position.set(0, -0.11, 0); thigh.rotation.y = isFront ? Math.PI / 2 : -Math.PI / 2; hipPivot.add(thigh);
 
     const kneePivot = new THREE.Group(); kneePivot.position.set(0, -0.22, 0); kneePivot.rotation.x = kneeAngle; hipPivot.add(kneePivot);
-    const shin = shadowAll(new THREE.Mesh(new THREE.CylinderGeometry(0.042, 0.036, 0.22, 10), pantsMat)); shin.position.set(0, -0.11, 0); shin.rotation.y = isFront ? Math.PI / 2 : -Math.PI / 2; kneePivot.add(shin);
+    const shadowCyl = shadowAll(new THREE.Mesh(new THREE.CylinderGeometry(0.042, 0.036, 0.22, 10), pantsMat)); shadowCyl.position.set(0, -0.11, 0); shadowCyl.rotation.y = isFront ? Math.PI / 2 : -Math.PI / 2; kneePivot.add(shadowCyl);
 
     const anklePivot = new THREE.Group(); anklePivot.position.set(0, -0.22, 0); anklePivot.rotation.x = ankleAngle; kneePivot.add(anklePivot);
     const shoe = shadowAll(new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.045, 0.16), shoeMat)); shoe.position.set(0, -0.03, 0); shoe.rotation.y = side * (Math.PI / 2) - Math.PI / 2; anklePivot.add(shoe);
@@ -363,7 +307,7 @@ function makeGroundTexture() {
 }
 
 /* ---------------------------------------------------------
-   LIVE 3D VIEW (Main Screen Component)
+    LIVE 3D VIEW (Main Screen Component)
 --------------------------------------------------------- */
 function Live3DView({ custom, telemetryRef, connected, usePhone, phoneTiltRef, stance, esp32Status }) {
   const mountRef = useRef(null);
@@ -479,7 +423,7 @@ function Live3DView({ custom, telemetryRef, connected, usePhone, phoneTiltRef, s
 }
 
 /* ---------------------------------------------------------
-   GARAGE PREVIEW COMPONENT
+    GARAGE PREVIEW COMPONENT
 --------------------------------------------------------- */
 function GaragePreview({ custom, stance }) {
   const mountRef = useRef(null);
@@ -518,7 +462,7 @@ function GaragePreview({ custom, stance }) {
 }
 
 /* ---------------------------------------------------------
-   MAIN ROOT APPLICATION
+    MAIN ROOT APPLICATION
 --------------------------------------------------------- */
 export default function App() {
   useFonts();
@@ -610,7 +554,7 @@ export default function App() {
 
   return (
     <div style={{ backgroundColor: C.crt, minHeight: "100vh", color: C.text, fontFamily: MONO_FONT, padding: 24 }}>
-      <header style={{ borderBottom: `2px solid ${C.panelLine}`, paddingBottom: 12, marginBottom: 20, display: "flex", justifyContent: "between", alignItems: "center" }}>
+      <header style={{ borderBottom: `2px solid ${C.panelLine}`, paddingBottom: 12, marginBottom: 20, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h1 style={{ fontFamily: DISPLAY_FONT, color: C.cyan, fontSize: 28, textShadow: `0 0 8px ${C.cyan}` }}>RIDERANALYTIC APP</h1>
         <div style={{ display: "flex", gap: 12 }}>
           <button onClick={() => setActiveTab("live")} style={{ padding: "8px 16px", background: activeTab === "live" ? C.cyan : C.panel, color: activeTab === "live" ? C.crt : C.text, border: "none", cursor: "pointer", fontWeight: "bold" }}>LIVE ACCEL</button>
@@ -671,6 +615,27 @@ export default function App() {
               <label style={{ color: C.green, display: "block", marginBottom: 4 }}>COUPE DE CHEVEUX</label>
               <select value={custom.hairstyle} onChange={(e) => setCustom({ ...custom, hairstyle: e.target.value })} style={{ width: "100%", padding: 6, background: C.screen, color: C.text, border: `1px solid ${C.panelLine}` }}>
                 {HAIRSTYLES.map((h) => <option key={h.id} value={h.id}>{h.name}</option>)}
+              </select>
+            </div>
+
+            <div>
+              <label style={{ color: C.cyan, display: "block", marginBottom: 4 }}>COULEUR DES CHEVEUX</label>
+              <select value={custom.hair} onChange={(e) => setCustom({ ...custom, hair: e.target.value })} style={{ width: "100%", padding: 6, background: C.screen, color: C.text, border: `1px solid ${C.panelLine}` }}>
+                {HAIR_COLORS.map((hc) => <option key={hc.name} value={hc.color}>{hc.name}</option>)}
+              </select>
+            </div>
+
+            <div>
+              <label style={{ color: C.orange, display: "block", marginBottom: 4 }}>COULEUR DU PANTALON</label>
+              <select value={custom.pants} onChange={(e) => setCustom({ ...custom, pants: e.target.value })} style={{ width: "100%", padding: 6, background: C.screen, color: C.text, border: `1px solid ${C.panelLine}` }}>
+                {PANTS.map((p) => <option key={p.name} value={p.color}>{p.name}</option>)}
+              </select>
+            </div>
+
+            <div>
+              <label style={{ color: C.yellow, display: "block", marginBottom: 4 }}>ROUES</label>
+              <select value={custom.wheels} onChange={(e) => setCustom({ ...custom, wheels: e.target.value })} style={{ width: "100%", padding: 6, background: C.screen, color: C.text, border: `1px solid ${C.panelLine}` }}>
+                {WHEELS.map((w) => <option key={w.name} value={w.color}>{w.name}</option>)}
               </select>
             </div>
           </div>
